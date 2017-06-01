@@ -22,6 +22,10 @@ local CLASS_OBJECT_FLAG_FIELD_NAME = "__joo4lua_isClass"
 
 --  find member from super classes
 local function findMember(member, superClasses)
+    if not superClasses then
+        return nil
+    end
+
     for _, parentClass in ipairs(superClasses) do
         local v = parentClass[member]
         if v then return v end
@@ -36,13 +40,14 @@ function P.createInterface(...)
 
     function derivedInterface:declareMedhod(methodName, methodDesc)
         if not methodName then
-            error("First parameter 'methodName' can not be nil.")
+            error("First parameter 'method name' can not be nil.", 2)
         end
         if not methodDesc then
-            error("Second parameter 'methodDesc' can not be nil.")
+            error("Second parameter 'method description' can not be nil.", 2)
         end
         rawset(self, methodName, function()
-            error("Method '" .. methodName .. "' is not implemented. \n" .. methodDesc)
+            error("Method '" .. methodName .. "' is not still implemented. Method description:\n"
+                    .. methodDesc, 2)
         end)
     end
 
@@ -51,7 +56,7 @@ function P.createInterface(...)
             return findMember(key, arg)
         end,
         __newindex = function (t, k, v)
-            error("Can not add member to a interface.", 2)
+            error("Can not add member to a interface. Use 'declareMedhod' to declare a method to interface.", 2)
         end
     })
 
@@ -71,13 +76,17 @@ local function createClass(...)
     derivedClass[CLASS_OBJECT_FLAG_FIELD_NAME] = true
     function derivedClass:new(o)
         if self[CLASS_OBJECT_FLAG_FIELD_NAME] then
-            o = o or {}
-            setmetatable(o, derivedClass)
+            local objWrapper = {}
+            setmetatable(objWrapper, derivedClass)
             derivedClass.__index = derivedClass
-            self[CLASS_OBJECT_FLAG_FIELD_NAME] = false
+            objWrapper[CLASS_OBJECT_FLAG_FIELD_NAME] = false
+
+            o = o or {}
+            setmetatable(o, objWrapper)
+            objWrapper.__index = objWrapper
             return o
         else
-            error("Only Class object can Instantiate, this object is an Instance.")
+            error("Only Class object can be instantiate, this object is an instance.", 2)
         end
     end
 
@@ -90,23 +99,35 @@ end
 function P.createClass(...)
     local superClass = {};
     if #arg > 1 then
-        error("Java style object-oriented programming just support single inheritance.")
+        error("Java style object-oriented programming just support single inheritance.", 2)
     elseif 1 == #arg then
         superClass = arg[1]
     end
     local derivedClass = createClass(superClass)
     derivedClass[SUPER_CLASS_FIELD_NAME] = superClass
 
-    function derivedClass:implements(...)
-        if #arg < 1 then
-            error("Parameters can not be nil.")
-        end
-        local extendedClass = createClass(self, arg)
-        derivedClass[INTERFACES_FIELD_NAME] = {...}
-        return extendedClass
+    return derivedClass
+end
+
+--  implements interfaces
+function P.implements(...)
+    local arg = {...}
+    if not arg or #arg < 1 then
+        error("First parameter 'class' can not be nil.", 2)
+    end
+    if not arg or #arg < 2 then
+        error("Parameters 'baseInterfaces' can not be nil.", 2)
+    end
+    local class = arg[1]
+    local baseInterfaces = {}
+    for i = 2, #arg do
+       table.insert(baseInterfaces, arg[i])
     end
 
-    return derivedClass
+    local extendedClass = createClass(...)
+    extendedClass[INTERFACES_FIELD_NAME] = baseInterfaces
+    extendedClass[SUPER_CLASS_FIELD_NAME] = class[SUPER_CLASS_FIELD_NAME]
+    return extendedClass
 end
 
 
