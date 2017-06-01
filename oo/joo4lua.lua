@@ -18,6 +18,7 @@ end
 local SUPER_CLASS_FIELD_NAME = "__joo4lua_superClass"
 local INTERFACES_FIELD_NAME = "__joo4lua_baseInterfaces"
 local CLASS_OBJECT_FLAG_FIELD_NAME = "__joo4lua_isClass"
+local INTERFACE_OBJECT_FLAG_FIELD_NAME = "__joo4lua_isInterface"
 
 
 --  find member from super classes
@@ -36,7 +37,8 @@ end
 --  if number of parameters is zero, it will extends from {}.
 function P.createInterface(...)
     local derivedInterface = {}
-    derivedInterface[INTERFACES_FIELD_NAME] = {...}
+    derivedInterface[INTERFACES_FIELD_NAME] = {... }
+    derivedInterface[INTERFACE_OBJECT_FLAG_FIELD_NAME] = true
 
     function derivedInterface:declareMedhod(methodName, methodDesc)
         if not methodName then
@@ -116,12 +118,16 @@ function P.implements(...)
         error("First parameter 'class' can not be nil.", 2)
     end
     if not arg or #arg < 2 then
-        error("Parameters 'baseInterfaces' can not be nil.", 2)
+        error("Please specify interfaces to implements.", 2)
     end
     local class = arg[1]
     local baseInterfaces = {}
     for i = 2, #arg do
-       table.insert(baseInterfaces, arg[i])
+        if rawget(arg[i], INTERFACE_OBJECT_FLAG_FIELD_NAME) then
+            table.insert(baseInterfaces, arg[i])
+        else
+            error("Parameter Type error, only interface can be implements.", 2)
+        end
     end
 
     local extendedClass = createClass(...)
