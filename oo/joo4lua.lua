@@ -1,5 +1,5 @@
 --[[
-    desc: Java style object-oriented helper functions
+    desc: Java style object-oriented helper functions for Lua
     author: Elvin Zeng
     date: 2017-6-1
 --]]
@@ -36,13 +36,13 @@ function P.createInterface(...)
 
     function derivedInterface:declareMedhod(methodName, methodDesc)
         if not methodName then
-            error("first parameter 'methodName' can not be nil.")
+            error("First parameter 'methodName' can not be nil.")
         end
         if not methodDesc then
-            error("second parameter 'methodDesc' can not be nil.")
+            error("Second parameter 'methodDesc' can not be nil.")
         end
         rawset(self, methodName, function()
-            error("method '" .. methodName .. "' is not implemented. \n" .. methodDesc)
+            error("Method '" .. methodName .. "' is not implemented. \n" .. methodDesc)
         end)
     end
 
@@ -51,7 +51,7 @@ function P.createInterface(...)
             return findMember(key, arg)
         end,
         __newindex = function (t, k, v)
-            error("can not add member to a interface.", 2)
+            error("Can not add member to a interface.", 2)
         end
     })
 
@@ -99,7 +99,7 @@ function P.createClass(...)
 
     function derivedClass:implements(...)
         if #arg < 1 then
-            error("parameters can not be nil.")
+            error("Parameters can not be nil.")
         end
         local extendedClass = createClass(self, arg)
         derivedClass[INTERFACES_FIELD_NAME] = {...}
