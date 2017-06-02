@@ -1,7 +1,6 @@
 --[[
     desc: Java style object-oriented helper functions for Lua
     author: Elvin Zeng
-    date: 2017-6-1
 --]]
 
 
