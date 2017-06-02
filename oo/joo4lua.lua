@@ -36,6 +36,15 @@ end
 --  create a interface with specified super interfaces.
 --  if number of parameters is zero, it will extends from {}.
 function P.createInterface(...)
+    local arg = {...}
+    if arg and #arg > 0 then
+        for i = 1, #arg do
+            if not rawget(arg[i], INTERFACE_OBJECT_FLAG_FIELD_NAME) then
+                error("Parameter Type error, only joo4lua interface can be extends.", 2)
+            end
+        end
+    end
+
     local derivedInterface = {}
     derivedInterface[INTERFACES_FIELD_NAME] = {... }
     derivedInterface[INTERFACE_OBJECT_FLAG_FIELD_NAME] = true
@@ -104,6 +113,9 @@ function P.createClass(...)
         error("Java style object-oriented programming just support single inheritance.", 2)
     elseif 1 == #arg then
         superClass = arg[1]
+        if not superClass[CLASS_OBJECT_FLAG_FIELD_NAME] then
+            error("specified class is not a valid joo4lua class.", 2)
+        end
     end
     local derivedClass = createClass(superClass)
     derivedClass[SUPER_CLASS_FIELD_NAME] = superClass
@@ -121,12 +133,15 @@ function P.implements(...)
         error("Please specify interfaces to implements.", 2)
     end
     local class = arg[1]
+    if not class[CLASS_OBJECT_FLAG_FIELD_NAME] then
+        error("specified class is not a valid joo4lua class.", 2)
+    end
     local baseInterfaces = {}
     for i = 2, #arg do
         if rawget(arg[i], INTERFACE_OBJECT_FLAG_FIELD_NAME) then
             table.insert(baseInterfaces, arg[i])
         else
-            error("Parameter Type error, only interface can be implements.", 2)
+            error("Parameter Type error, only joo4lua interface can be implements.", 2)
         end
     end
 
