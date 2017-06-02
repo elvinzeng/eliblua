@@ -107,6 +107,7 @@ end
 --  just single inheritance.
 --  if number of parameters is zero, derived class will extends from {}.
 function P.createClass(...)
+    local arg = {...}
     local superClass = {};
     if #arg > 1 then
         error("Java style object-oriented programming just support single inheritance.", 2)
