@@ -75,6 +75,7 @@ end
 
 --  create class from specified super classes
 local function createClass(...)
+    local arg = {...}
     local derivedClass = {}
 
     setmetatable(derivedClass, {

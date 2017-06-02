@@ -50,6 +50,9 @@ Named:declareMedhod("setName", [[
 
 
 local Animal = oo.createClass()
+function Animal:run()
+    print("running...")
+end
 local Human = oo.createClass(Animal)
 Human = oo.implements(Human, SpeakingAblity, WritingAbility, Named)
 function Human:setName(name)
@@ -78,6 +81,7 @@ local American = oo.createClass(Human)
 American = oo.implements(American, KnowingEnglish)
 
 local american = American:new()
+american:run()
 american:write("write test...")
 american:speakEnglish("hello")
 
